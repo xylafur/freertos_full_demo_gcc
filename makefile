@@ -8,15 +8,16 @@
 #===============================================================
 $(info Using Device MSP432P401R as default)
 
-
 #======================= Environment setup =======================
+
+# Setup things common to all enviornments
+RM := rm -rf
+MKDIR := mkdir -p -- $@
+DEVICE := MSP432P401R
+OUTPUT_DIR := output
+
 ifeq ($(OS),Windows_NT) #Windows setup with cygwin toolchain
-   RM := rm -rf
-   MKDIR = mkdir -p -- $@
-   DEVICE=MSP432P401R
-   OUTPUT_DIR := output
    BASE_DIR := d:/ti/ccsv8/ccs_base
-   #BASE_DIR := /cygdrive/d/ti/ccsv8/ccs_base
    COMPILER_DIR := /cygdrive/d/ti/ccsv8/tools/compiler/gcc-arm-none-eabi-7-2017-q4-major-win32
    TI_DRVLIB_DIR := ./driverlib
    TI_DRVLIB_DIR_INC := ./driverlib/inc
@@ -32,12 +33,29 @@ ifeq ($(OS),Windows_NT) #Windows setup with cygwin toolchain
    #=======================
    CC := $(GCC_BIN_DIR)/arm-none-eabi-gcc.exe
    GDB := $(GCC_BIN_DIR)/arm-none-eabi-gdb.exe
-   
-else #Linux Setup
-   RM := rm -rf
-   MKDIR = mkdir -p -- $@
-   DEVICE=MSP432P401R
-   OUTPUT_DIR := output
+
+# The user is on linux, check if they have ccsv8 installed
+else ifeq ($(wildcard /opt/ccstudio/ccsv8,),)
+   BASE_DIR := /opt/ccstudio/ccsv8/ccs_base
+   COMPILER_DIR := /opt/ccstudio/ccsv8/tools/compiler/gcc-arm-none-eabi-7-2017-q4-major
+   TI_DRVLIB_DIR := ./driverlib
+   TI_DRVLIB_DIR_INC := ./driverlib/inc
+   TI_DRVLIB_LIB_DIR := $(TI_DRVLIB_DIR)/gcc
+   TI_DRVLIB_LIB := msp432
+   GCC_MSP_INC_DIR ?= $(BASE_DIR)/arm/include
+   GCC_CMSIS_INC_DIR ?= $(GCC_MSP_INC_DIR)/CMSIS
+   LDDIR := $(GCC_MSP_INC_DIR)/$(shell echo $(DEVICE) | tr A-Z a-z)
+
+   #======================= Compiler executable =======================
+   GCC_BIN_DIR ?= $(COMPILER_DIR)/bin
+   GCC_INC_DIR ?= $(COMPILER_DIR)/arm-none-eabi/include
+   #=======================
+
+   CC := $(GCC_BIN_DIR)/arm-none-eabi-gcc
+   GDB := $(GCC_BIN_DIR)/arm-none-eabi-gdb
+
+# Linux ccsv6 setup
+else
    BASE_DIR := /opt/ti/ccsv6/ccs_base
    COMPILER_DIR := /opt/ti/ccsv6/tools/compiler/gcc-arm-none-eabi-4_9-2015q3
    TI_DRVLIB_DIR := ./driverlib
