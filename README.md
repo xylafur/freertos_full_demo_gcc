@@ -11,9 +11,17 @@ This project was designed to run in the MSP432P401R LaunchPad http://www.ti.com/
 
 Setup for linux:
 
+You can either install CCS and use their compiler and header files, or you may
+install the GNU ARM Cross Compiler.
+
+Using GNU Cross Compiler
+1. Install the GNU ARM Cross Compiler
+2. Run `submodule init && submodule update --recrusive`
+
+Using CCS
 1. Download TI CCS and ensure you install the GCC compiler. http://www.ti.com/tool/ccstudio
-3. Rename the project to freertos_full_demo_gcc
 2. Import the project in CCS.
+3. Rename the project to freertos_full_demo_gcc
 
 Setup for windows:
 
