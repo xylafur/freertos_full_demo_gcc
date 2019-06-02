@@ -34,6 +34,26 @@ ifeq ($(OS),Windows_NT) #Windows setup with cygwin toolchain
    CC := $(GCC_BIN_DIR)/arm-none-eabi-gcc.exe
    GDB := $(GCC_BIN_DIR)/arm-none-eabi-gdb.exe
 
+# IF the user has the gcc-arm cross compiler installed, just use that
+else ifeq ($(shell which arm-none-eabi-gcc 1>&2 2>/dev/null; echo $$?),0)
+   BASE_DIR := ./CCS_Base
+
+   TI_DRVLIB_DIR := ./driverlib
+   TI_DRVLIB_DIR_INC := ./driverlib/inc
+   TI_DRVLIB_LIB_DIR := $(TI_DRVLIB_DIR)/gcc
+   TI_DRVLIB_LIB := msp432
+
+   GCC_MSP_INC_DIR ?= $(BASE_DIR)/arm/include
+   GCC_CMSIS_INC_DIR ?= $(GCC_MSP_INC_DIR)/CMSIS
+   LDDIR := $(GCC_MSP_INC_DIR)/$(shell echo $(DEVICE) | tr A-Z a-z)
+
+   # TODO: This is super dependent on the arm-gcc that is installed.. not sure how to
+   # solve this yet
+   GCC_INC_DIR ?= /usr/lib/gcc/arm-none-eabi/9.1.0/include
+   
+   CC := arm-none-eabi-gcc
+   GDB := arm-none-eabi-gdb
+
 # The user is on linux, check if they have ccsv8 installed
 else ifeq ($(wildcard /opt/ccstudio/ccsv8,),)
    BASE_DIR := /opt/ccstudio/ccsv8/ccs_base
