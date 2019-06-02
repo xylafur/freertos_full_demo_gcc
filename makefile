@@ -34,6 +34,7 @@ ifeq ($(OS),Windows_NT) #Windows setup with cygwin toolchain
    CC := $(GCC_BIN_DIR)/arm-none-eabi-gcc.exe
    GDB := $(GCC_BIN_DIR)/arm-none-eabi-gdb.exe
 
+
 # IF the user has the gcc-arm cross compiler installed, just use that
 else ifeq ($(shell which arm-none-eabi-gcc 1>&2 2>/dev/null; echo $$?),0)
    BASE_DIR := ./CCS_Base
@@ -53,6 +54,7 @@ else ifeq ($(shell which arm-none-eabi-gcc 1>&2 2>/dev/null; echo $$?),0)
    
    CC := arm-none-eabi-gcc
    GDB := arm-none-eabi-gdb
+
 
 # The user is on linux, check if they have ccsv8 installed
 else ifeq ($(wildcard /opt/ccstudio/ccsv8,),)
@@ -94,6 +96,9 @@ else
    GDB := $(GCC_BIN_DIR)/arm-none-eabi-gdb
    
 endif
+
+# Should be common to all setups
+DSLITE := $(BASE_DIR)/DebugServer/bin/DSLite
 
 #======================= Path Setup =======================
 OS_DIR := ./FreeRTOS
@@ -224,6 +229,9 @@ $(OUTPUT_DIR)/$(PROJ_OUT).out : . $(OBJ_OUT)
 
 debug: all
 	$(GDB) $(OUTPUT_DIR)/$(PROJ_OUT).out
+
+flash: $(OUTPUT_DIR)/$(PROJ_OUT).out
+	$(DSLITE) load --config=MSP432P401R.ccxml $(PROJ_OUT)/$(PROJ_OUT).out
 
 clean:
 	@echo "Cleaning project"
